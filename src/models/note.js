@@ -36,4 +36,4 @@ const noteSchema = new mongoose.Schema(
   },
 );
 
-export const Note = mongoose.model('notes', noteSchema);
+export const Note = mongoose.model('Note', noteSchema);
