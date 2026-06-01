@@ -13,6 +13,12 @@ app.use(cors());
 app.use(express.json());
 app.use(pino());
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'API is running successfully',
+  });
+});
+
 app.get('/notes', (req, res) => {
   res.status(200).json({
     message: 'Retrieved all notes',
