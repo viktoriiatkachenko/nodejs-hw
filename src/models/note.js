@@ -21,6 +21,14 @@ const noteSchema = new mongoose.Schema(
       default: 'Todo',
       index: true,
     },
+
+    // ✅ ДОБАВИЛИ ЭТО
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
