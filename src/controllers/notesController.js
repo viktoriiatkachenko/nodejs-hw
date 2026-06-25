@@ -22,15 +22,14 @@ export const getAllNotes = async (req, res, next) => {
       });
     }
 
-    const notes = await query.skip(skip).limit(perPage);
+    const filter = query.getFilter();
 
-    const totalNotes = await Note.countDocuments(
-      query.getFilter ? query.getFilter() : {
-        userId: req.user._id,
-      }
-    );
+    const [notes, totalNotes] = await Promise.all([
+      query.clone().skip(skip).limit(perPage),
+      Note.countDocuments(filter),
+    ]);
 
-    res.json({
+    res.status(200).json({
       page: Number(page),
       perPage: Number(perPage),
       totalNotes,
