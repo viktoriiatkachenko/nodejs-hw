@@ -1,29 +1,34 @@
 import createHttpError from 'http-errors';
 import { Note } from '../models/note.js';
 
-// GET ALL NOTES (только user)
 export const getAllNotes = async (req, res, next) => {
   try {
     const { page = 1, perPage = 10, tag, search } = req.query;
 
-    const filter = { userId: req.user._id };
-
-    if (tag) filter.tag = tag;
-
-    if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
-      ];
-    }
-
     const skip = (page - 1) * perPage;
 
-    const notes = await Note.find(filter)
-      .skip(skip)
-      .limit(perPage);
+    let query = Note.find().where('userId').equals(req.user._id);
 
-    const totalNotes = await Note.countDocuments(filter);
+    if (tag) {
+      query = query.where('tag').equals(tag);
+    }
+
+    if (search) {
+      query = query.where({
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { content: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
+
+    const notes = await query.skip(skip).limit(perPage);
+
+    const totalNotes = await Note.countDocuments(
+      query.getFilter ? query.getFilter() : {
+        userId: req.user._id,
+      }
+    );
 
     res.json({
       page: Number(page),
@@ -37,7 +42,6 @@ export const getAllNotes = async (req, res, next) => {
   }
 };
 
-// GET BY ID
 export const getNoteById = async (req, res, next) => {
   try {
     const { noteId } = req.params;
@@ -57,7 +61,6 @@ export const getNoteById = async (req, res, next) => {
   }
 };
 
-// CREATE
 export const createNote = async (req, res, next) => {
   try {
     const note = await Note.create({
@@ -71,7 +74,6 @@ export const createNote = async (req, res, next) => {
   }
 };
 
-// UPDATE
 export const updateNote = async (req, res, next) => {
   try {
     const { noteId } = req.params;
@@ -95,7 +97,6 @@ export const updateNote = async (req, res, next) => {
   }
 };
 
-// DELETE
 export const deleteNote = async (req, res, next) => {
   try {
     const { noteId } = req.params;
