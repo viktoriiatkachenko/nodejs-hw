@@ -9,7 +9,6 @@ import {
   setSessionCookies,
 } from '../services/auth.js';
 
-// REGISTER
 export const registerUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -37,7 +36,6 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
-// LOGIN
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -48,9 +46,9 @@ export const loginUser = async (req, res, next) => {
       throw createHttpError(401, 'Invalid credentials');
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) {
+    if (!isValid) {
       throw createHttpError(401, 'Invalid credentials');
     }
 
@@ -66,7 +64,6 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
-// LOGOUT
 export const logoutUser = async (req, res, next) => {
   try {
     const { sessionId } = req.cookies;
@@ -85,7 +82,6 @@ export const logoutUser = async (req, res, next) => {
   }
 };
 
-// REFRESH SESSION
 export const refreshUserSession = async (req, res, next) => {
   try {
     const { sessionId, refreshToken } = req.cookies;
