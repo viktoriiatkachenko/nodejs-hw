@@ -19,7 +19,7 @@ export const updateUserAvatar = async (req, res, next) => {
     const updatedUser = await User.findByIdAndUpdate(
       user._id,
       { avatar: uploadResult.secure_url },
-      { new: true },
+      { returnDocument: 'after', },
     );
 
     res.status(200).json({
@@ -30,7 +30,6 @@ export const updateUserAvatar = async (req, res, next) => {
   }
 };
 
-/* (опционально, но часто есть в структуре задания) */
 export const getCurrentUser = async (req, res) => {
   const { _id, email, username, avatar } = req.user;
 

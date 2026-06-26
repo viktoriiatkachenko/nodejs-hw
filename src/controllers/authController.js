@@ -140,9 +140,14 @@ export const requestResetEmail = async (req, res, next) => {
     }
 
     const token = jwt.sign(
-      { sub: user._id, email: user.email },
+      {
+        sub: user._id,
+        email: user.email,
+      },
       JWT_SECRET,
-      { expiresIn: '15m' },
+      {
+        expiresIn: '15m',
+      },
     );
 
     const templatePath = new URL(
@@ -152,20 +157,30 @@ export const requestResetEmail = async (req, res, next) => {
 
     const templateSource = await fs.readFile(templatePath, 'utf-8');
 
-    const compiledTemplate = handlebars.compile(templateSource);
+    const template = handlebars.compile(templateSource);
 
-    const html = compiledTemplate({
+    const html = template({
       username: user.username,
       link: `${process.env.FRONTEND_DOMAIN}/reset-password?token=${token}`,
     });
 
-    await sendEmail({
-      to: user.email,
-      subject: 'Reset your password',
-      html,
-    });
+    try {
+      await sendEmail({
+        from: process.env.SMTP_FROM,
+        to: user.email,
+        subject: 'Reset your password',
+        html,
+      });
+    } catch {
+      return next(
+        createHttpError(
+          500,
+          'Failed to send the email, please try again later.',
+        ),
+      );
+    }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Password reset email sent successfully',
     });
   } catch (error) {

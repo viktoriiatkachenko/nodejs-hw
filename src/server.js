@@ -25,26 +25,32 @@ const startServer = async () => {
 
   app.use(logger);
   app.use(express.json());
+
   app.use(
-  cors({
-    origin: process.env.FRONTEND_DOMAIN,
-    credentials: true,
-  }),
+    cors({
+      origin: process.env.FRONTEND_DOMAIN,
+      credentials: true,
+    }),
   );
+
   app.use(cookieParser());
 
   app.get('/', (req, res) => {
-    res.status(200).json({
-      message: 'API is running successfully',
-    });
+    res.status(200).json({ message: 'API is running successfully' });
   });
 
-  app.use(authRoutes);
+  // routes
   app.use(notesRoutes);
+  app.use(authRoutes);
   app.use(userRoutes);
 
-  app.use(errors());
+  // ❗ ВАЖНО: 404 ДО errors()
   app.use(notFoundHandler);
+
+  // celebrate errors
+  app.use(errors());
+
+  // global error handler
   app.use(errorHandler);
 
   app.listen(PORT, () => {
