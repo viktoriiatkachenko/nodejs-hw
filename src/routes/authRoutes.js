@@ -4,31 +4,47 @@ import { celebrate } from 'celebrate';
 import {
   registerUserSchema,
   loginUserSchema,
+  requestResetEmailSchema,
+  resetPasswordSchema,
 } from '../validations/authValidation.js';
 
 import {
   registerUser,
   loginUser,
-  refreshUserSession,
   logoutUser,
+  refreshUserSession,
+  requestResetEmail,
+  resetPassword,
 } from '../controllers/authController.js';
 
 const router = Router();
 
 router.post(
-  '/auth/register',
-  celebrate(registerUserSchema),
+  '/register',
+  celebrate({ body: registerUserSchema }),
   registerUser,
 );
 
 router.post(
-  '/auth/login',
-  celebrate(loginUserSchema),
+  '/login',
+  celebrate({ body: loginUserSchema }),
   loginUser,
 );
 
-router.post('/auth/refresh', refreshUserSession);
+router.post('/logout', logoutUser);
 
-router.post('/auth/logout', logoutUser);
+router.post('/refresh', refreshUserSession);
+
+router.post(
+  '/request-reset-email',
+  celebrate({ body: requestResetEmailSchema }),
+  requestResetEmail,
+);
+
+router.post(
+  '/reset-password',
+  celebrate({ body: resetPasswordSchema }),
+  resetPassword,
+);
 
 export default router;
